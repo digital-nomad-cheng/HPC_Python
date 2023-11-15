@@ -10,33 +10,33 @@ import pylab as p
 
 plt.interactive(True)
 
-
-nx = 41
-ny = 41
-nt = 500
-nit = 50
+meshscale = 6
+nx = 41*meshscale
+ny = 41*meshscale
+nt = 10
+nit = 50 * meshscale
 c = 1
 dx = 2 / (nx - 1)
 dy = 2 / (ny - 1)
-x = numpy.linspace(0, 2, nx)
-y = numpy.linspace(0, 2, ny)
+x = numpy.linspace(0, 2, nx, dtype = numpy.float64)
+y = numpy.linspace(0, 2, ny, dtype = numpy.float64)
 X, Y = numpy.meshgrid(x, y)
 
 rho = 1
 nu = .1
-dt = .001
+dt = .001 / meshscale
 
-u = numpy.zeros((ny, nx))
-v = numpy.zeros((ny, nx))
-p = numpy.zeros((ny, nx)) 
-b = numpy.zeros((ny, nx))
+u = numpy.zeros((ny, nx), dtype = numpy.float64)
+v = numpy.zeros((ny, nx), dtype = numpy.float64)
+p = numpy.zeros((ny, nx), dtype = numpy.float64)
+b = numpy.zeros((ny, nx), dtype = numpy.float64)
 
 # The pressure Poisson equation that's written above can be hard to write out without typos. 
 # The function build_up_b below represents the contents of the square brackets, 
 # so that the entirety of the PPE is slightly more manageable.
 
 def build_up_b(b, rho, dt, u, v, dx, dy):
-    
+
     b[1:-1, 1:-1] = (rho * (1 / dt * 
                     ((u[1:-1, 2:] - u[1:-1, 0:-2]) / 
                      (2 * dx) + (v[2:, 1:-1] - v[0:-2, 1:-1]) / (2 * dy)) -
@@ -136,7 +136,7 @@ plt.savefig('p_NS.png',bbox_inches='tight')
 # plotting velocity field
 pyplot.quiver(X[::2, ::2], Y[::2, ::2], u[::2, ::2], v[::2, ::2]) 
 pyplot.xlabel('X')
-pyplot.ylabel('Y');
+pyplot.ylabel('Y')
 plt.savefig('vect_NS.png',bbox_inches='tight')
 
 
