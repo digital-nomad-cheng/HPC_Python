@@ -6,9 +6,12 @@ import time
 # from scipy.sparse import spdiags,linalg,eye
 from cupyx.scipy.sparse import spdiags, linalg, eye
 import socket
+from easydict import EasyDict
 
-global  c_omega_1, c_omega_2, cmu, convergence_limit_eps, convergence_limit_k, convergence_limit_om, convergence_limit_pp, \
-        convergence_limit_u, convergence_limit_v, convergence_limit_w, dist,fx, fy,imon,jmon,kappa,k_bc_east,k_bc_east_type, \
+cfg = EasyDict()
+
+global  cfg.cfg.c_omega_1, cfg.c_omega_2, cfg.cmu, cfg.convergence_limit_eps, cfg.convergence_limit_k, cfg.convergence_limit_om, cfg.convergence_limit_pp, \
+        cfg.convergence_limit_u, cfg.convergence_limit_v, cfg.convergence_limit_w, cfg.dist,cfg.fx, cfg.fy,cfg.imon,cfg.jmon,kappa,k_bc_east,k_bc_east_type, \
         k_bc_north,k_bc_north_type,k_bc_south, k_bc_south_type,k_bc_west,k_bc_west_type,kom,maxit, \
         ni,nj,nsweep_kom, nsweep_pp, nsweep_vel,  om_bc_east, om_bc_east_type, om_bc_north, om_bc_north_type, \
         om_bc_south, om_bc_south_type, om_bc_west, om_bc_west_type, p_bc_east, p_bc_east_type, \
@@ -26,10 +29,10 @@ def test_cupy_solver():
        scheme_turb='h'  #hybrid upwind-central 
 
 ########### section 2 turbulence models ###########
-       cmu=0.09
+       cfg.cmu=0.09
        kom = False
-       c_omega_1= 5./9.
-       c_omega_2=3./40.
+       cfg.c_omega_1= 5./9.
+       cfg.c_omega_2=3./40.
        prand_omega=2.0
        prand_k=2.0
 
@@ -60,17 +63,17 @@ def test_cupy_solver():
        nsweep_vel=50
        nsweep_pp=50
        nsweep_kom=1
-       convergence_limit_vel=1e-6
-       convergence_limit_u=1e-6
-       convergence_limit_v=1e-6
-       convergence_limit_w=1e-6
-       convergence_limit_k=1e-10
-       convergence_limit_om=1e-10
-       convergence_limit_pp=5e-4
+       cfg.convergence_limit_vel=1e-6
+       cfg.convergence_limit_u=1e-6
+       cfg.convergence_limit_v=1e-6
+       cfg.convergence_limit_w=1e-6
+       cfg.convergence_limit_k=1e-10
+       cfg.convergence_limit_om=1e-10
+       cfg.convergence_limit_pp=5e-4
 
 ########### section 7 all variables are printed during the iteration at node ###########
-       imon=ni-10
-       jmon=int(nj/2)
+       cfg.imon=ni-10
+       cfg.jmon=int(nj/2)
 
 ########### section 8 time-averaging ###########
        vtk=False
@@ -138,8 +141,8 @@ def test_cupy_solver():
 
        xwall_s=0.5*(x2d[0:-1,0]+x2d[1:,0])
        ywall_s=0.5*(y2d[0:-1,0]+y2d[1:,0])
-       dist2_s=(yp2d[:,0]-ywall_s)**2+(xp2d[:,0]-xwall_s)**2
-       om_bc_south=10*6*viscos/0.075/dist2_s
+       cfg.dist2_s=(yp2d[:,0]-ywall_s)**2+(xp2d[:,0]-xwall_s)**2
+       om_bc_south=10*6*viscos/0.075/cfg.dist2_s
 
        om_bc_west_type='d'
        om_bc_east_type='n'
@@ -150,24 +153,24 @@ def test_cupy_solver():
 
 
 
-    def modify_init(u2d,v2d,k2d,om2d,vis2d):
+    def modicfg.fy_init(u2d,v2d,k2d,om2d,vis2d):
        
        return u2d,v2d,k2d,om2d,vis2d
 
-    def modify_inlet():
+    def modicfg.fy_inlet():
 
        global y_rans,y_rans,u_rans,v_rans,k_rans,om_rans,uv_rans,k_bc_west,eps_bc_west,om_bc_west
 
        return u_bc_west,v_bc_west,k_bc_west,om_bc_west,u2d_face_w,convw
 
-    def modify_conv(convw,convs):
+    def modicfg.fy_conv(convw,convs):
 
        convs[:,0,:]=0
        convs[:,-1,:]=0
 
        return convw,convs
 
-    def modify_u(su2d,sp2d):
+    def modicfg.fy_u(su2d,sp2d):
 
        global file1
 
@@ -179,7 +182,7 @@ def test_cupy_solver():
 
        return su2d,sp2d
 
-    def modify_v(su2d,sp2d):
+    def modicfg.fy_v(su2d,sp2d):
        su2d[0,:]= su2d[0,:]+convw[0,:]*v_bc_west
        sp2d[0,:]= sp2d[0,:]-convw[0,:]
        vist=vis2d[0,:]-viscos
@@ -188,7 +191,7 @@ def test_cupy_solver():
 
        return su2d,sp2d
 
-    def modify_k(su2d,sp2d,gen):
+    def modicfg.fy_k(su2d,sp2d,gen):
 
        su2d[0,:]= su2d[0,:]+np.maximum(convw[0,:],0)*k_bc_west
        sp2d[0,:]= sp2d[0,:]-convw[0,:]
@@ -199,7 +202,7 @@ def test_cupy_solver():
 
        return su2d,sp2d
 
-    def modify_om(su2d,sp2d):
+    def modicfg.fy_om(su2d,sp2d):
 
 
        su2d[0,:]= su2d[0,:]+np.maximum(convw[0,:],0)*om_bc_west
@@ -210,7 +213,7 @@ def test_cupy_solver():
 
        return su2d,sp2d
 
-    def modify_outlet(convw):
+    def modicfg.fy_outlet(convw):
 
 # inlet
        flow_in=np.sum(convw[0,:])
@@ -242,7 +245,7 @@ def test_cupy_solver():
 
        return aw2d,ae2d,as2d,an2d,ap2d,su2d,sp2d
 
-    def modify_vis(vis2d):
+    def modicfg.fy_vis(vis2d):
 
        return vis2d
 
@@ -254,12 +257,12 @@ def test_cupy_solver():
     def init():
        print('hostname: ',socket.gethostname())
 
-# distance to nearest wall
+# cfg.distance to nearest wall
        ywall_s=0.5*(y2d[0:-1,0]+y2d[1:,0])
-       dist_s=yp2d-ywall_s[:,None]
+       cfg.dist_s=yp2d-ywall_s[:,None]
        ywall_n=0.5*(y2d[0:-1,-1]+y2d[1:,-1])
-       dist_n=ywall_n[:,None] -yp2d
-       dist=np.minimum(dist_s,dist_n)
+       cfg.dist_n=ywall_n[:,None] -yp2d
+       cfg.dist=np.minimum(cfg.dist_s,cfg.dist_n)
 
 #  west face coordinate
        xw=0.5*(x2d[0:-1,0:-1]+x2d[0:-1,1:])
@@ -267,7 +270,7 @@ def test_cupy_solver():
 
        del1x=((xw-xp2d)**2+(yw-yp2d)**2)**0.5
        del2x=((xw-np.roll(xp2d,1,axis=0))**2+(yw-np.roll(yp2d,1,axis=0))**2)**0.5
-       fx=del2x/(del1x+del2x)
+       cfg.fx=del2x/(del1x+del2x)
 
 #  south face coordinate
        xs=0.5*(x2d[0:-1,0:-1]+x2d[1:,0:-1])
@@ -275,7 +278,7 @@ def test_cupy_solver():
 
        del1y=((xs-xp2d)**2+(ys-yp2d)**2)**0.5
        del2y=((xs-np.roll(xp2d,1,axis=1))**2+(ys-np.roll(yp2d,1,axis=1))**2)**0.5
-       fy=del2y/(del1y+del2y)
+       cfg.fy=del2y/(del1y+del2y)
 
        areawy=np.diff(x2d,axis=1)
        areawx=-np.diff(y2d,axis=1)
@@ -311,7 +314,7 @@ def test_cupy_solver():
 
        ae_bound=areaw[-1,:]**2/(0.5*vol[-1,:])
 
-       return areaw,areawx,areawy,areas,areasx,areasy,vol,fx,fy,aw_bound,ae_bound,as_bound,an_bound,dist
+       return areaw,areawx,areawy,areas,areasx,areasy,vol,cfg.fx,cfg.fy,aw_bound,ae_bound,as_bound,an_bound,cfg.dist
 
     def print_indata():
 
@@ -323,11 +326,11 @@ def test_cupy_solver():
 
        print('\n\n########### section 2 turbulence models ###########')
 
-       print(f"{'cmu: ':<29} {cmu}")
+       print(f"{'cfg.cmu: ':<29} {cfg.cmu}")
        print(f"{'kom: ':<29} {kom}")
        if kom:
-          print(f"{'c_omega_1: ':<29} {c_omega_1:.3f}")
-          print(f"{'c_omega_2: ':<29} {c_omega_2}")
+          print(f"{'cfg.c_omega_1: ':<29} {cfg.c_omega_1:.3f}")
+          print(f"{'cfg.c_omega_2: ':<29} {cfg.c_omega_2}")
           print(f"{'prand_k: ':<29} {prand_k}")
           print(f"{'prand_omega: ':<29} {prand_omega}")
 
@@ -349,16 +352,16 @@ def test_cupy_solver():
        print(f"{'nsweep_vel: ':<29} {nsweep_vel}")
        print(f"{'nsweep_pp: ':<29} {nsweep_pp}")
        print(f"{'nsweep_kom: ':<29} {nsweep_kom}")
-       print(f"{'convergence_limit_u: ':<29} {convergence_limit_u}")
-       print(f"{'convergence_limit_v: ':<29} {convergence_limit_v}")
-       print(f"{'convergence_limit_w: ':<29} {convergence_limit_w}")
-       print(f"{'convergence_limit_pp: ':<29} {convergence_limit_pp}")
-       print(f"{'convergence_limit_k: ':<29} {convergence_limit_k}")
-       print(f"{'convergence_limit_om: ':<29} {convergence_limit_om}")
+       print(f"{'cfg.convergence_limit_u: ':<29} {cfg.convergence_limit_u}")
+       print(f"{'cfg.convergence_limit_v: ':<29} {cfg.convergence_limit_v}")
+       print(f"{'cfg.convergence_limit_w: ':<29} {cfg.convergence_limit_w}")
+       print(f"{'cfg.convergence_limit_pp: ':<29} {cfg.convergence_limit_pp}")
+       print(f"{'cfg.convergence_limit_k: ':<29} {cfg.convergence_limit_k}")
+       print(f"{'cfg.convergence_limit_om: ':<29} {cfg.convergence_limit_om}")
 
        print('\n\n########### section 7 all variables are printed during the iteration at node ###########')
-       print(f"{'imon: ':<29} {imon}")
-       print(f"{'jmon: ':<29} {jmon}")
+       print(f"{'cfg.imon: ':<29} {cfg.imon}")
+       print(f"{'cfg.jmon: ':<29} {cfg.jmon}")
 
 
        print('\n\n########### section 8 time-averaging ###########')
@@ -451,8 +454,8 @@ def test_cupy_solver():
 
        phi2d_face_w=np.empty((ni+1,nj))
        phi2d_face_s=np.empty((ni,nj+1))
-       phi2d_face_w[0:-1,:]=fx*phi2d+(1-fx)*np.roll(phi2d,1,axis=0)
-       phi2d_face_s[:,0:-1]=fy*phi2d+(1-fy)*np.roll(phi2d,1,axis=1)
+       phi2d_face_w[0:-1,:]=cfg.fx*phi2d+(1-cfg.fx)*np.roll(phi2d,1,axis=0)
+       phi2d_face_s[:,0:-1]=cfg.fy*phi2d+(1-cfg.fy)*np.roll(phi2d,1,axis=1)
 
 # west boundary 
        phi2d_face_w[0,:]=phi_bc_west
@@ -503,8 +506,8 @@ def test_cupy_solver():
        viss=np.zeros((ni,nj+1))
        vis_turb=(vis2d-viscos)/prand
 
-       visw[0:-1,:]=fx*vis_turb+(1-fx)*np.roll(vis_turb,1,axis=0)+viscos
-       viss[:,0:-1]=fy*vis_turb+(1-fy)*np.roll(vis_turb,1,axis=1)+viscos
+       visw[0:-1,:]=cfg.fx*vis_turb+(1-cfg.fx)*np.roll(vis_turb,1,axis=0)+viscos
+       viss[:,0:-1]=cfg.fy*vis_turb+(1-cfg.fy)*np.roll(vis_turb,1,axis=1)+viscos
 
        volw=np.ones((ni+1,nj))*1e-10
        vols=np.ones((ni,nj+1))*1e-10
@@ -517,26 +520,26 @@ def test_cupy_solver():
           if iter == 0:
              print('hybrid scheme, prand=',prand)
 
-          aw2d=np.maximum(convw[0:-1,:],diffw+(1-fx)*convw[0:-1,:])
+          aw2d=np.maximum(convw[0:-1,:],diffw+(1-cfg.fx)*convw[0:-1,:])
           aw2d=np.maximum(aw2d,0.)
 
-          ae2d=np.maximum(-convw[1:,:],np.roll(diffw,-1,axis=0)-np.roll(fx,-1,axis=0)*convw[1:,:])
+          ae2d=np.maximum(-convw[1:,:],np.roll(diffw,-1,axis=0)-np.roll(cfg.fx,-1,axis=0)*convw[1:,:])
           ae2d=np.maximum(ae2d,0.)
 
-          as2d=np.maximum(convs[:,0:-1],diffs+(1-fy)*convs[:,0:-1])
+          as2d=np.maximum(convs[:,0:-1],diffs+(1-cfg.fy)*convs[:,0:-1])
           as2d=np.maximum(as2d,0.)
 
-          an2d=np.maximum(-convs[:,1:],np.roll(diffs,-1,axis=1)-np.roll(fy,-1,axis=1)*convs[:,1:])
+          an2d=np.maximum(-convs[:,1:],np.roll(diffs,-1,axis=1)-np.roll(cfg.fy,-1,axis=1)*convs[:,1:])
           an2d=np.maximum(an2d,0.)
 
        if scheme_local == 'c':
           if iter == 0:
              print('CDS scheme, prand=',prand)
-          aw2d=diffw+(1-fx)*convw[0:-1,:]
-          ae2d=np.roll(diffw,-1,axis=0)-np.roll(fx,-1,axis=0)*convw[1:,:]
+          aw2d=diffw+(1-cfg.fx)*convw[0:-1,:]
+          ae2d=np.roll(diffw,-1,axis=0)-np.roll(cfg.fx,-1,axis=0)*convw[1:,:]
 
-          as2d=diffs+(1-fy)*convs[:,0:-1]
-          an2d=np.roll(diffs,-1,axis=1)-np.roll(fy,-1,axis=1)*convs[:,1:]
+          as2d=diffs+(1-cfg.fy)*convs[:,0:-1]
+          an2d=np.roll(diffs,-1,axis=1)-np.roll(cfg.fy,-1,axis=1)*convs[:,1:]
 
        aw2d[0,:]=0
        ae2d[-1,:]=0
@@ -601,8 +604,8 @@ def test_cupy_solver():
 
        dp=np.roll(p2d_e,-1,axis=0)-3*p2d_e+3*p2d_w-np.roll(p2d_w,1,axis=0)
 
-#  apw[1:,:]=fx*np.roll(ap2d_vel,-1,axis=0)+(1-fx)*ap2d_vel
-       apw[0:-1,:]=fx*ap2d_vel+(1-fx)*np.roll(ap2d_vel,1,axis=0)
+#  apw[1:,:]=cfg.fx*np.roll(ap2d_vel,-1,axis=0)+(1-cfg.fx)*ap2d_vel
+       apw[0:-1,:]=cfg.fx*ap2d_vel+(1-cfg.fx)*np.roll(ap2d_vel,1,axis=0)
        apw[-1,:]=1e-20
      
        dvelw=dp*areaw/4/apw
@@ -627,8 +630,8 @@ def test_cupy_solver():
 
        dp=np.roll(p2d_n,-1,axis=1)-3*p2d_n+3*p2d_s-np.roll(p2d_s,1,axis=1)
 
-#  aps[:,1:]=fy*np.roll(ap2d_vel,-1,axis=1)+(1-fy)*ap2d_vel
-       aps[:,0:-1]=fy*ap2d_vel+(1-fy)*np.roll(ap2d_vel,1,axis=1)
+#  aps[:,1:]=cfg.fy*np.roll(ap2d_vel,-1,axis=1)+(1-cfg.fy)*ap2d_vel
+       aps[:,0:-1]=cfg.fy*ap2d_vel+(1-cfg.fy)*np.roll(ap2d_vel,1,axis=1)
        aps[:,-1]=1e-20
      
        dvels=dp*areas/4/aps
@@ -748,8 +751,8 @@ def test_cupy_solver():
        dpdx=dphidx(p2d_face_w,p2d_face_s)
        su2d=su2d-dpdx*vol
 
-# modify su & sp
-       su2d,sp2d=modify_u(su2d,sp2d)
+# modicfg.fy su & sp
+       su2d,sp2d=modicfg.fy_u(su2d,sp2d)
 
        ap2d=aw2d+ae2d+as2d+an2d-sp2d
 
@@ -768,8 +771,8 @@ def test_cupy_solver():
        dpdy=dphidy(p2d_face_w,p2d_face_s)
        su2d=su2d-dpdy*vol
 
-# modify su & sp
-       su2d,sp2d=modify_v(su2d,sp2d)
+# modicfg.fy su & sp
+       su2d,sp2d=modicfg.fy_v(su2d,sp2d)
 
        ap2d=aw2d+ae2d+as2d+an2d-sp2d
 
@@ -798,10 +801,10 @@ def test_cupy_solver():
        vist=np.maximum(vis2d-viscos,1e-10)
        su2d=su2d+vist*gen*vol
 
-       sp2d=sp2d-cmu*om2d*vol
+       sp2d=sp2d-cfg.cmu*om2d*vol
 
-# modify su & sp
-       su2d,sp2d=modify_k(su2d,sp2d)
+# modicfg.fy su & sp
+       su2d,sp2d=modicfg.fy_k(su2d,sp2d)
 
        ap2d=aw2d+ae2d+as2d+an2d-sp2d
 
@@ -817,13 +820,13 @@ def test_cupy_solver():
 
 
 #--------production term
-       su2d=su2d+c_omega_1*gen*vol
+       su2d=su2d+cfg.c_omega_1*gen*vol
 
 #--------dissipation term
-       sp2d=sp2d-c_omega_2*om2d*vol
+       sp2d=sp2d-cfg.c_omega_2*om2d*vol
 
-# modify su & sp
-       su2d,sp2d=modify_om(su2d,sp2d)
+# modicfg.fy su & sp
+       su2d,sp2d=modicfg.fy_om(su2d,sp2d)
 
        ap2d=aw2d+ae2d+as2d+an2d-sp2d
 
@@ -847,19 +850,19 @@ def test_cupy_solver():
        ap2d_vel=np.maximum(ap2d_vel*(1.-urf_vel),1.e-20)
 
 #\\\\\\\\\\\\\\\\ west face 
-#  visw[0:-1,:,:]=fx*vis_turb+(1-fx)*np.roll(vis_turb,1,axis=0)+viscos
-#  viss[:,0:-1,:]=fy*vis_turb+(1-fy)*np.roll(vis_turb,1,axis=1)+viscos
+#  visw[0:-1,:,:]=cfg.fx*vis_turb+(1-cfg.fx)*np.roll(vis_turb,1,axis=0)+viscos
+#  viss[:,0:-1,:]=cfg.fy*vis_turb+(1-cfg.fy)*np.roll(vis_turb,1,axis=1)+viscos
 
-#  apw[1:,:]=fx*np.roll(ap2d_vel,-1,axis=0)+(1-fx)*ap2d_vel
-       apw[0:-1,:]=fx*ap2d_vel+(1-fx)*np.roll(ap2d_vel,1,axis=0)
+#  apw[1:,:]=cfg.fx*np.roll(ap2d_vel,-1,axis=0)+(1-cfg.fx)*ap2d_vel
+       apw[0:-1,:]=cfg.fx*ap2d_vel+(1-cfg.fx)*np.roll(ap2d_vel,1,axis=0)
        apw[0,:]=1e-20
        dw=areawx**2+areawy**2
        aw2d=dw[0:-1,:]/apw[0:-1,:]
        ae2d=np.roll(aw2d,-1,axis=0)
 
 #\\\\\\\\\\\\\\\\ south face 
-#  aps[:,1:]=fy*np.roll(ap2d_vel,-1,axis=1)+(1-fy)*ap2d_vel
-       aps[:,0:-1]=fy*ap2d_vel+(1-fy)*np.roll(ap2d_vel,1,axis=1)
+#  aps[:,1:]=cfg.fy*np.roll(ap2d_vel,-1,axis=1)+(1-cfg.fy)*ap2d_vel
+       aps[:,0:-1]=cfg.fy*ap2d_vel+(1-cfg.fy)*np.roll(ap2d_vel,1,axis=1)
        aps[:,0]=1e-20
        ds=areasx**2+areasy**2
        as2d=ds[:,0:-1]/aps[:,0:-1]
@@ -922,8 +925,8 @@ def test_cupy_solver():
        visold= vis2d
        vis2d= k2d/om2d+viscos
 
-# modify viscosity
-       vis2d=modify_vis(vis2d)
+# modicfg.fy viscosity
+       vis2d=modicfg.fy_vis(vis2d)
 
 #            under-relax viscosity
        vis2d= urfvis*vis2d+(1.-urfvis)*visold
@@ -1033,14 +1036,14 @@ def test_cupy_solver():
     aw_bound=np.zeros((nj))
     ae_bound=np.zeros((nj))
     az_bound=np.zeros((ni,nj))
-    fx=np.zeros((ni,nj))
-    fy=np.zeros((ni,nj))
+    cfg.fx=np.zeros((ni,nj))
+    cfg.fy=np.zeros((ni,nj))
 
     setup_case()
 
     print_indata()
 
-    areaw,areawx,areawy,areas,areasx,areasy,vol,fx,fy,aw_bound,ae_bound,as_bound,an_bound,dist=init()
+    areaw,areawx,areawy,areas,areasx,areasy,vol,cfg.fx,cfg.fy,aw_bound,ae_bound,as_bound,an_bound,cfg.dist=init()
 
 
 # initialization
@@ -1084,7 +1087,7 @@ def test_cupy_solver():
 
 
 # initialize
-    u2d,v2d,k2d,om2d,vis2d=modify_init(u2d,v2d,k2d,om2d,vis2d)
+    u2d,v2d,k2d,om2d,vis2d=modicfg.fy_init(u2d,v2d,k2d,om2d,vis2d)
 
 # read data from restart
     if restart: 
@@ -1100,7 +1103,7 @@ def test_cupy_solver():
         p_bc_west_type,p_bc_east_type,p_bc_south_type,p_bc_north_type)
 
 
-    u_bc_west,v_bc_west,k_bc_west,om_bc_west,u2d_face_w,convw = modify_inlet()
+    u_bc_west,v_bc_west,k_bc_west,om_bc_west,u2d_face_w,convw = modicfg.fy_inlet()
 
     convw,convs=conv(u2d,v2d,p2d_face_w,p2d_face_s)
 
@@ -1131,7 +1134,7 @@ def test_cupy_solver():
           start_time = time.time()
 # conpute inlet fluc
           if iter == 0:
-             u_bc_west,v_bc_west,k_bc_west,om_bc_west,u2d_face_w,convw = modify_inlet()
+             u_bc_west,v_bc_west,k_bc_west,om_bc_west,u2d_face_w,convw = modicfg.fy_inlet()
           aw2d,ae2d,as2d,an2d,su2d,sp2d=coeff(convw,convs,vis2d,1,scheme)
 # u2d
 # boundary conditions for u2d
@@ -1139,7 +1142,7 @@ def test_cupy_solver():
                        u_bc_west_type,u_bc_east_type,u_bc_south_type,u_bc_north_type)
           su2d,sp2d,ap2d=calcu(su2d,sp2d,p2d_face_w,p2d_face_s)
 
-          u2d,residual_u=solve_2d(u2d,aw2d,ae2d,as2d,an2d,su2d,ap2d,convergence_limit_u,nsweep_vel,solver_vel)
+          u2d,residual_u=solve_2d(u2d,aw2d,ae2d,as2d,an2d,su2d,ap2d,cfg.convergence_limit_u,nsweep_vel,solver_vel)
           print(f"{'time u: '}{time.time()-start_time:.2e}")
 
           start_time = time.time()
@@ -1148,20 +1151,20 @@ def test_cupy_solver():
           su2d,sp2d=bc(su2d,sp2d,v_bc_west,v_bc_east,v_bc_south,v_bc_north, \
                        v_bc_west_type,v_bc_east_type,v_bc_south_type,v_bc_north_type)
           su2d,sp2d,ap2d,ap2d_vel=calcv(su2d,sp2d,p2d_face_w,p2d_face_s)
-          v2d,residual_v=solve_2d(v2d,aw2d,ae2d,as2d,an2d,su2d,ap2d,convergence_limit_v,nsweep_vel,solver_vel)
+          v2d,residual_v=solve_2d(v2d,aw2d,ae2d,as2d,an2d,su2d,ap2d,cfg.convergence_limit_v,nsweep_vel,solver_vel)
           print(f"{'time v: '}{time.time()-start_time:.2e}")
 
           start_time = time.time()
 # pp2d
           convw,convs=conv(u2d,v2d,p2d_face_w,p2d_face_s)
-          convw=modify_outlet(convw)
+          convw=modicfg.fy_outlet(convw)
           aw2d,ae2d,as2d,an2d,su2d,ap2d=calcp(pp2d,ap2d_vel)
           pp2d=np.zeros((ni,nj))
-          pp2d,dummy=solve_2d(pp2d,aw2d,ae2d,as2d,an2d,su2d,ap2d,convergence_limit_pp,nsweep_pp,solver_pp)
+          pp2d,dummy=solve_2d(pp2d,aw2d,ae2d,as2d,an2d,su2d,ap2d,cfg.convergence_limit_pp,nsweep_pp,solver_pp)
 
 # correct u, v, w, p
           convw,convs,p2d,u2d,v2d,su2d= correct_u_v_p(u2d,v2d,p2d)
-          convw=modify_outlet(convw)
+          convw=modicfg.fy_outlet(convw)
 # continuity error
           su2d=convw[0:-1,:]-np.roll(convw[0:-1,:],-1,axis=0)+convs[:,0:-1]-np.roll(convs[:,0:-1],-1,axis=1)
           residual_pp=abs(np.sum(su2d))
@@ -1187,7 +1190,7 @@ def test_cupy_solver():
                        k_bc_west_type,k_bc_east_type,k_bc_south_type,k_bc_north_type)
              su2d,sp2d,gen,ap2d=calck(su2d,sp2d,k2d,om2d,vis2d,u2d_face_w,u2d_face_s,v2d_face_w,v2d_face_s)
 
-             k2d,residual_k=solve_2d(k2d,aw2d,ae2d,as2d,an2d,su2d,ap2d,convergence_limit_k,nsweep_kom,solver_turb)
+             k2d,residual_k=solve_2d(k2d,aw2d,ae2d,as2d,an2d,su2d,ap2d,cfg.convergence_limit_k,nsweep_kom,solver_turb)
              k2d=np.maximum(k2d,1e-10)
              print(f"{'time k: '}{time.time()-start_time:.2e}")
 
@@ -1201,7 +1204,7 @@ def test_cupy_solver():
 
              aw2d,ae2d,as2d,an2d,ap2d,su2d,sp2d=fix_omega()
 
-             om2d,residual_om=solve_2d(om2d,aw2d,ae2d,as2d,an2d,su2d,ap2d,convergence_limit_om,nsweep_kom,solver_turb)
+             om2d,residual_om=solve_2d(om2d,aw2d,ae2d,as2d,an2d,su2d,ap2d,cfg.convergence_limit_om,nsweep_kom,solver_turb)
              om2d=np.maximum(om2d,1e-10)
 
              print(f"{'time omega: '}{time.time()-start_time:.2e}")
@@ -1220,9 +1223,9 @@ def test_cupy_solver():
     , {'v:'}{residual_v:.2e}, {'pp:'}{residual_pp:.2e}, {'k:'}{residual_k:.2e}\
     , {'om:'}{residual_om:.2e}\n")
 
-          print(f"\n{'monitor iteration:'}{iter:4d}, {'u:'}{u2d[imon,jmon]: .2e}\
-    , {'v:'}{v2d[imon,jmon]: .2e}, {'p:'}{p2d[imon,jmon]: .2e}\
-    , {'k:'}{k2d[imon,jmon]: .2e}, {'om:'}{om2d[imon,jmon]: .2e}\n")
+          print(f"\n{'monitor iteration:'}{iter:4d}, {'u:'}{u2d[cfg.imon,cfg.jmon]: .2e}\
+    , {'v:'}{v2d[cfg.imon,cfg.jmon]: .2e}, {'p:'}{p2d[cfg.imon,cfg.jmon]: .2e}\
+    , {'k:'}{k2d[cfg.imon,cfg.jmon]: .2e}, {'om:'}{om2d[cfg.imon,cfg.jmon]: .2e}\n")
 
 
 
