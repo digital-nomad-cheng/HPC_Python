@@ -1,0 +1,8 @@
+.ipynb_checkpoints
+*.png
+*.npy
+*.txt
+pythons-rans-code-RANS-open/*
+tune_tmp/*
+*.dat
+*__pycache__*/*
