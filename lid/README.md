@@ -6,3 +6,4 @@
 # How to run
 1. profile program sort function by total time it consumes: 
 	`python3 -m cProfile -s tottime cupy_exec-pyCALC-RANS.py > profiling_results.txt`
+    `python -m cProfile -s tottime your_script.py | head -n 20`
