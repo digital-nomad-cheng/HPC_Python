@@ -1,7 +1,7 @@
 echo "Generate data set with different grid size first.."
 # loop over grid size
 sizes=(60 120 240 480 960)
-for size in $sizes
+for size in "${sizes[@]}"
 do 
   echo "grid size: $size"
   python3 generate-channel-grid.py --grid_size $size
@@ -19,5 +19,4 @@ do
   done
 done
 
-# sed -i 's/old_string/new_string/g' filename.txt
 
