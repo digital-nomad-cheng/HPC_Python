@@ -7,6 +7,9 @@ import time
 from cupyx.scipy.sparse import spdiags, linalg, eye
 import socket
 
+def print(*args, **kwargs):
+    pass
+
 def setup_case():
    global  c_omega_1, c_omega_2, cmu, convergence_limit_eps, convergence_limit_k, convergence_limit_om, convergence_limit_pp, \
    convergence_limit_u, convergence_limit_v, convergence_limit_w, dist,fx, fy,imon,jmon,kappa,k_bc_east,k_bc_east_type, \
@@ -50,11 +53,9 @@ def setup_case():
    min_iter=1
    sormax=1e-20
 
-   solver_vel='lgmres'
-   solver_pp='lgmres'
-   solver_vel='cg'
-   solver_pp='cg'
-   solver_turb='gmres'
+   solver_vel='direct'
+   solver_pp='direct'
+   solver_turb='direct'
    nsweep_vel=50
    nsweep_pp=50
    nsweep_kom=1

@@ -52,11 +52,9 @@ def setup_case():
    min_iter=1
    sormax=1e-20
 
-   solver_vel='lgmres'
-   solver_pp='lgmres'
    solver_vel='direct'
    solver_pp='direct'
-   solver_turb='gmres'
+   solver_turb='direct'
    nsweep_vel=50
    nsweep_pp=50
    nsweep_kom=1
