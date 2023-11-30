@@ -4,6 +4,9 @@ import sys
 import time
 from scipy.sparse import spdiags,linalg,eye
 
+def print(*args, **kwargs):
+    pass
+
 def setup_case():
    global  c_omega_1, c_omega_2, cmu, convergence_limit_eps, convergence_limit_k, convergence_limit_om, convergence_limit_pp, \
    convergence_limit_u, convergence_limit_v, convergence_limit_w, dist,fx, fy,imon,jmon,kappa,k_bc_east,k_bc_east_type, \
