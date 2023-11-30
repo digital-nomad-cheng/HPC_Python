@@ -6,7 +6,7 @@ do
   echo "grid size: $size"
   python3 generate-channel-grid.py --grid_size $size
   # loop over solvers
-  solvers=("direct" "cg")
+  solvers=("direct" "cg", "cgs", "gmres", "qmr", "lgmres")
   for solver in "${solvers[@]}"
   do
     echo "benchmarking solver: $solver"
