@@ -1,12 +1,13 @@
 echo "Generate data set with different grid size first.."
 # loop over grid size
 sizes=(60 120 240 480 960)
+# sizes=(60)
 for size in "${sizes[@]}"
 do 
   echo "grid size: $size"
   python3 generate-channel-grid.py --grid_size $size
   # loop over solvers
-  solvers=("direct" "cg", "cgs", "gmres", "qmr", "lgmres")
+  solvers=("direct" "cg" "cgs" "gmres" "qmr" "lgmres")
   for solver in "${solvers[@]}"
   do
     echo "benchmarking solver: $solver"
