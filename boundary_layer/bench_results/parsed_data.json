@@ -1,0 +1,164 @@
+{
+    "cgs": {
+        "cpu": {
+            "1": {
+                "time": 12.131,
+                "smallest_resmax": 0.00037642194603839475
+            },
+            "5": {
+                "time": 234.185,
+                "smallest_resmax": 0.0007041589515542407
+            },
+            "10": {
+                "time": 2490.846,
+                "smallest_resmax": NaN
+            }
+        },
+        "cupy": {
+            "1": {
+                "time": 13.348,
+                "smallest_resmax": 0.00025834974630960575
+            },
+            "5": {
+                "time": 13.507,
+                "smallest_resmax": 0.001213896919470266
+            },
+            "10": {
+                "time": 100.438,
+                "smallest_resmax": NaN
+            }
+        }
+    },
+    "cg": {
+        "cpu": {
+            "1": {
+                "time": 35.807,
+                "smallest_resmax": NaN
+            },
+            "5": {
+                "time": 288.541,
+                "smallest_resmax": NaN
+            },
+            "10": {
+                "time": 1731.648,
+                "smallest_resmax": NaN
+            }
+        },
+        "cupy": {
+            "5": {
+                "time": 20.029,
+                "smallest_resmax": NaN
+            }
+        }
+    },
+    "gmres": {
+        "cpu": {
+            "1": {
+                "time": 12.444,
+                "smallest_resmax": 0.00026450126268282156
+            },
+            "5": {
+                "time": 268.252,
+                "smallest_resmax": 0.00032972231699962947
+            },
+            "10": {
+                "time": 1114.687,
+                "smallest_resmax": 0.00024105584517962575
+            }
+        },
+        "cupy": {
+            "1": {
+                "time": 11.073,
+                "smallest_resmax": 0.0003436417591867384
+            },
+            "5": {
+                "time": 17.411,
+                "smallest_resmax": 0.0003170359925098695
+            },
+            "10": {
+                "time": 35.489,
+                "smallest_resmax": 0.000228245472436482
+            },
+            "15": {
+                "time": 66.958,
+                "smallest_resmax": 0.00018786170681444142
+            },
+            "20": {
+                "time": 107.416,
+                "smallest_resmax": 0.00016267564557601006
+            },
+            "30": {
+                "time": 230.502,
+                "smallest_resmax": 0.0001333468126322622
+            },
+            "34": {
+                "time": 941.364,
+                "smallest_resmax": 0.00012537641884993446
+            },
+            "37": {
+                "time": 5112.476,
+                "smallest_resmax": 0.00012019402505249055
+            },
+            "40": {
+                "time": 86.954,
+                "smallest_resmax": 0.012972770256019436
+            }
+        }
+    },
+    "lgmres": {
+        "cpu": {
+            "1": {
+                "time": 11.956,
+                "smallest_resmax": 0.00038358781881443494
+            },
+            "5": {
+                "time": 224.631,
+                "smallest_resmax": 0.0003517492437083868
+            },
+            "10": {
+                "time": 917.893,
+                "smallest_resmax": 0.00025415860805465246
+            }
+        }
+    },
+    "pyamg": {
+        "cpu": {
+            "1": {
+                "time": 28.085,
+                "smallest_resmax": 0.00022868016377989949
+            },
+            "5": {
+                "time": 493.877,
+                "smallest_resmax": 0.00030345467154584425
+            },
+            "10": {
+                "time": 1946.153,
+                "smallest_resmax": 0.00022249965018432606
+            }
+        }
+    },
+    "qmr": {
+        "cpu": {
+            "1": {
+                "time": 12.366,
+                "smallest_resmax": 0.00043541357784119715
+            },
+            "5": {
+                "time": 294.422,
+                "smallest_resmax": 0.0017418055205675777
+            },
+            "10": {
+                "time": 1414.133,
+                "smallest_resmax": 0.025405892210883425
+            }
+        }
+    },
+    "minres": {
+        "cupy": {
+            "1": {
+                "time": 2.644,
+                "smallest_resmax": Infinity
+            }
+        }
+    }
+}
