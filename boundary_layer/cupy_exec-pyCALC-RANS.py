@@ -9,6 +9,7 @@ import socket
 import cupy as np
 from cupyx.scipy import sparse
 from cupyx.scipy.sparse import spdiags, linalg, eye
+import pyamgx
 
 def print(*args):
     pass
@@ -43,13 +44,12 @@ def setup_case():
     urf_omega = 0.5
 
     ########### section 6 number of iteration and convergence criterira ###########
-    maxit = 200
+    maxit = 1
     min_iter = 1
     sormax = 1e-5
 
     solver_vel = "gmres"
-    solver_pp = "gmres"
-    solver_turb = "lgmres"
+    solver_pp = "pyamgx"
     solver_turb = "gmres"
     arguments = sys.argv
     if len(arguments) > 1:
@@ -57,9 +57,9 @@ def setup_case():
       solver_pp = arguments[2]
       solver_turb = arguments[3]
 
-    nsweep_vel = 50
-    nsweep_pp = 50
-    nsweep_kom = 50
+    nsweep_vel = 1000
+    nsweep_pp = 1000
+    nsweep_kom = 1000
     convergence_limit_u = 1e-6
     convergence_limit_v = 1e-6
     convergence_limit_k = 1e-6
@@ -799,6 +799,92 @@ def solve_2d(phi2d, aw2d, ae2d, as2d, an2d, su2d, ap2d, tol_conv, nmax, solver_l
         if iter == 0:
             print("solver in solve_2d: lgmres")
         phi, info = linalg.lgmres(A, su, x0=phi, atol=tol_conv, maxiter=nmax)  # good
+    if solver_local == "pyamgx":
+        iteration_timer = time.time()
+        pyamgx.initialize()
+
+        # Initialize config and resources:
+        cfg = pyamgx.Config().create_from_dict({
+        "config_version": 2,
+                "exception_handling" : 1,
+                "solver": {
+                    "obtain_timings": 1,
+                    "monitor_residual": 1,
+                    "solver": "GMRES",
+                    "norm" : "L2",
+                    "gmres_n_restart" : 20,
+                    "convergence": "RELATIVE_INI_CORE",
+                    "max_iters" : nmax,
+                    "tolerance" : tol_conv,
+                    "preconditioner": {
+                        "solver": "AMG",
+                        "algorithm": "CLASSICAL",
+                        "max_iters" : 2,
+                        "presweeps": 1,
+                        "postsweeps": 1,
+                        "cycle": "V",
+                }
+            }
+        })
+        # AGG_DILU: 7,5 | AGG_GS: 7,3 | AGG_JACOBI: 17,8 | AGG_LDBJ: 
+        cfg = pyamgx.Config().create_from_dict({
+    "config_version": 2, 
+    "solver": {
+        "matrix_coloring_scheme": "MIN_MAX", 
+        "max_uncolored_percentage": 0.15, 
+        "algorithm": "AGGREGATION", 
+        "obtain_timings": 1, 
+        "solver": "AMG", 
+        "smoother": "MULTICOLOR_DILU", 
+        "presweeps": 1, 
+        "selector": "SIZE_2", 
+        "coarsest_sweeps": 2, 
+        "max_iters": nmax, 
+        "monitor_residual": 1, 
+        "scope": "main", 
+        "max_levels": 1000, 
+        "postsweeps": 1, 
+        "tolerance": tol_conv, 
+        "norm": "L2", 
+        "cycle": "V"
+    }
+})
+
+        rsc = pyamgx.Resources().create_simple(cfg)
+
+        # Create matrices and vectors:
+        amgx_A = pyamgx.Matrix().create(rsc)
+        amgx_b = pyamgx.Vector().create(rsc)
+        amgx_x = pyamgx.Vector().create(rsc)
+
+        # Create solver:
+
+        # Upload system:
+        amgx_A.upload_CSR(A)
+        amgx_b.upload_raw(su.data, su.size)
+        amgx_x.upload_raw(phi.data, phi.size)
+        
+        # Setup and solve system:
+        solver = pyamgx.Solver().create(rsc, cfg)
+        solver.setup(amgx_A)
+        solver.solve(amgx_b, amgx_x)
+
+        # Download solution
+        amgx_x.download_raw(phi.data)
+
+        # Clean up:
+        amgx_A.destroy()
+        amgx_x.destroy()
+        amgx_b.destroy()
+        solver.destroy()
+        rsc.destroy()
+        cfg.destroy()
+
+        pyamgx.finalize()
+        info = 0
+        sys.stdout.write(f"Full iteration time: {time.time() - iteration_timer}s\n")
+
+        
     if info > 0:
         print(
             "warning in module solve_2d: convergence in sparse matrix solver not reached"
@@ -1258,7 +1344,7 @@ residual_k = 0
 residual_om = 0
 
 ######################### start of global iteration process #############################
-
+starttttime = time.time()
 for iter in range(0, maxit):
     start_time_iter = time.time()
     # coefficients for velocities
@@ -1510,7 +1596,9 @@ for iter in range(0, maxit):
 
     if resmax < sormax:
         break
-    sys.stdout.write(f"\nresmax: {resmax}\n")
+    sys.stdout.write(f"resmax: {resmax}\n")
+sys.stdout.write(f"{starttttime - time.time()}\n")
+
 
 ######################### end of global iteration process #############################
 
