@@ -32,4 +32,6 @@ ax.set_yscale('log')
 
 ax.legend()
 
+plt.savefig('cg_2dplot.png', bbox_inches='tight')
+
 plt.show()

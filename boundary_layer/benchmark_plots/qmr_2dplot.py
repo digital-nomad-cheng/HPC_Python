@@ -28,4 +28,6 @@ ax.set_yscale('log')
 
 ax.legend()
 
+plt.savefig('qmr_2dplot.png', bbox_inches='tight')
+
 plt.show()

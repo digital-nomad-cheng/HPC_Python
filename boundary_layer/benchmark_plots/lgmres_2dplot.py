@@ -27,4 +27,6 @@ ax.set_yscale('log')
 
 ax.legend()
 
+plt.savefig('lgmres_2dplot.png', bbox_inches='tight')
+
 plt.show()
