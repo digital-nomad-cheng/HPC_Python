@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-functions_selected = ['coeff', 'solve_2d', 'tocoo']
+functions_selected = ['coeff', 'solve_2d', 'conv']
 
-cpu_cumtime_size1 = [0.457, 26.015, 0.719]
-cpu_cumtime_size5 = [33.033, 386.059, 17.040]
-cpu_cumtime_size10 = [138.364, 1492.898, 71.612]
+cpu_cumtime_size1 = [0.457, 26.015, 0.238]
+cpu_cumtime_size5 = [33.033, 386.059, 13.277]
+cpu_cumtime_size10 = [138.364, 1492.898, 56.258]
 
 bar_width = 0.2 
 index = np.arange(len(functions_selected))
@@ -27,6 +27,6 @@ ax.set_yscale('log')
 
 ax.legend()
 
-plt.savefig('pyamg_2dplot.png', bbox_inches='tight')
+plt.savefig('pyamg_2dplot.pdf', bbox_inches='tight')
 
 plt.show()

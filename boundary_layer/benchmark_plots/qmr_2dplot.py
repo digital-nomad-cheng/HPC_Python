@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-functions_selected = ['coeff', 'solve_2d', 'tocoo']
+functions_selected = ['coeff', 'solve_2d', 'conv']
 
 
-cpu_cumtime_size1 = [0.376, 10.778, 0.573]
-cpu_cumtime_size5 = [32.576, 191.601, 16.999]
-cpu_cumtime_size10 = [136.959, 984.549, 72.252]
+cpu_cumtime_size1 = [0.376, 10.778, 0.197]
+cpu_cumtime_size5 = [32.576, 191.601, 13.353]
+cpu_cumtime_size10 = [136.959, 984.549, 56.651]
 
 bar_width = 0.2 
 index = np.arange(len(functions_selected))  
@@ -28,6 +28,6 @@ ax.set_yscale('log')
 
 ax.legend()
 
-plt.savefig('qmr_2dplot.png', bbox_inches='tight')
+plt.savefig('qmr_2dplot.pdf', bbox_inches='tight')
 
 plt.show()

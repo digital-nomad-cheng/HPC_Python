@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 # coeff = Coefficients
 # solve_2d = Solving Navier-Strokes (?)
 # tocoo = to COOrdinate format
-functions = ['coeff', 'solve_2d', 'tocoo']
+functions = ['coeff', 'solve_2d', 'conv']
 
 
-cpu_cumtime_grid1 = [0.539, 33.452, 0.717]
-cpu_cumtime_grid5 = [32.938, 184.976, 17.195]
-cpu_cumtime_grid10 = [137.658, 1303.395, 73.657]
+cpu_cumtime_grid1 = [0.539, 33.452, 0.303]
+cpu_cumtime_grid5 = [32.938, 184.976, 13.409]
+cpu_cumtime_grid10 = [137.658, 1303.395, 54.978]
 
 fig, ax = plt.subplots()
 
@@ -32,6 +32,6 @@ ax.set_yscale('log')
 
 ax.legend()
 
-plt.savefig('cg_2dplot.png', bbox_inches='tight')
+plt.savefig('cg_2dplot.pdf', bbox_inches='tight')
 
 plt.show()

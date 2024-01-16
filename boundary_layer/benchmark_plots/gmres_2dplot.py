@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-functions_selected = ['coeff', 'solve_2d', 'tocoo']
+functions_selected = ['coeff', 'solve_2d', 'conv']
 
-cpu_cumtime_size1 = [0.428, 10.686, 0.566]
-cpu_cumtime_size5 = [33.364, 163.510, 17.151]
-cpu_cumtime_size10 = [138.567, 681.882, 71.695]
+cpu_cumtime_size1 = [0.428, 10.686, 0.224]
+cpu_cumtime_size5 = [33.364, 163.510, 13.418]
+cpu_cumtime_size10 = [138.567, 681.882, 54.786]
 
 bar_width = 0.2 
 index = np.arange(len(functions_selected))
@@ -27,6 +27,6 @@ ax.set_yscale('log')
 
 ax.legend()
 
-plt.savefig('gmres_2dplot.png', bbox_inches='tight')
+plt.savefig('gmres_2dplot.pdf', bbox_inches='tight')
 
 plt.show()
